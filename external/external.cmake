@@ -1,3 +1,5 @@
+message(STATUS "------------------------------------------")
+
 # glfw
 message(STATUS "initializing glfw")
 execute_process(COMMAND git submodule update --init -- external/glfw
@@ -22,4 +24,4 @@ execute_process(COMMAND git submodule update --init -- external/Vulkan-LoaderAnd
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(external/Vulkan-LoaderAndValidationLayers/include)
 
-
+message(STATUS "------------------------------------------")
