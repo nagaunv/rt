@@ -70,7 +70,7 @@ namespace naga::rt {
    * `origin + t * dir`
    * \notes: dropping constexpr since glm does not support it.
    */
-  /*constepxr*/ vec3 position(const Ray &ray, double t) {
+  /*constepxr*/ vec3 position(const Ray &ray, float_t t) {
     return ray.origin() + t * ray.dir();
   }
 

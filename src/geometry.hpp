@@ -4,22 +4,24 @@
 #include <fmt/format.h>
 #include <glm/glm.hpp>
 
+#include "float.hpp"
+
 /// \file Import vector and matrix from glm
 
 namespace naga::rt {
   /// 2D vector
-  using vec2 = glm::dvec2;
+  using vec2 = glm::tvec2<float_t>;
   /// 3D vector
-  using vec3 = glm::dvec3;
+  using vec3 = glm::tvec3<float_t>;
   /// 4D vector
-  using vec4 = glm::dvec4;
+  using vec4 = glm::tvec4<float_t>;
 
   /// 2x2 matrix
-  using mat2 = glm::dmat2;
+  using mat2 = glm::tmat2x2<float_t>;
   /// 3x3 matrix
-  using mat3 = glm::dmat3;
+  using mat3 = glm::tmat3x3<float_t>;
   /// 4x4 matrix
-  using mat4 = glm::dmat4;
+  using mat4 = glm::tmat4x4<float_t>;
 
   /// dump information to text
   std::string to_string(const vec2& v) {
