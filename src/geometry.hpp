@@ -4,27 +4,37 @@
 #include <fmt/format.h>
 #include <glm/glm.hpp>
 
+/// \file Import vector and matrix from glm
+
 namespace naga::rt {
-  // vec
+  /// 2D vector
   using vec2 = glm::dvec2;
+  /// 3D vector
   using vec3 = glm::dvec3;
+  /// 4D vector
   using vec4 = glm::dvec4;
 
-  // mat
+  /// 2x2 matrix
   using mat2 = glm::dmat2;
+  /// 3x3 matrix
   using mat3 = glm::dmat3;
+  /// 4x4 matrix
   using mat4 = glm::dmat4;
 
+  /// dump information to text
   std::string to_string(const vec2& v) {
     return fmt::format("vec2[{0}, {1}]", v.x, v.y);
   }
+  /// dump information to text
   std::string to_string(const vec3& v) {
     return fmt::format("vec2[{0}, {1}, {2}]", v.x, v.y, v.z);
   }
+  /// dump information to text
   std::string to_string(const vec4& v) {
     return fmt::format("vec2[{0}, {1}, {2}, {3}]", v.x, v.y, v.z, v.w);
   }
 
+  /// dump information to text
   std::string to_string(const mat2& m) {
     return fmt::format(
       "mat2"            //
@@ -33,6 +43,7 @@ namespace naga::rt {
       m[0][0], m[0][1], //
       m[1][0], m[1][1]);
   }
+  /// dump information to text
   std::string to_string(const mat3& m) {
     return fmt::format(
       "mat3"                     //
@@ -43,6 +54,7 @@ namespace naga::rt {
       m[1][0], m[1][1], m[1][2], //
       m[2][0], m[2][1], m[2][2]);
   }
+  /// dump information to text
   std::string to_string(const mat4& m) {
     return fmt::format(
       "mat4"                              //
