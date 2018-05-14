@@ -1,18 +1,24 @@
 [submodule "external/imgui"]
 	path = external/imgui
 	url = https://github.com/ocornut/imgui.git
+	ignore = dirty
 [submodule "external/glfw"]
 	path = external/glfw
 	url = https://github.com/glfw/glfw
+	ignore = dirty
 [submodule "external/glm"]
 	path = external/glm
 	url = https://github.com/g-truc/glm.git
+	ignore = dirty
 [submodule "external/fmt"]
 	path = external/fmt
 	url = https://github.com/fmtlib/fmt.git
+	ignore = dirty
 [submodule "external/range-v3"]
 	path = external/range-v3
 	url = https://github.com/ericniebler/range-v3.git
+	ignore = dirty
 [submodule "external/selene"]
 	path = external/selene
 	url = https://github.com/kmhofmann/selene.git
+	ignore = dirty
