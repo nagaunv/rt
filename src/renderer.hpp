@@ -41,7 +41,7 @@ namespace naga::rt {
       static_assert(
         std::is_same_v<
           Pixel,
-          decltype(std::declval<const T>().render(PixelLength(), PixelLength()))>,
+          decltype(std::declval<const T>().render(PixelIndex(), PixelIndex()))>,
         "T does not satisfy PixelRenderer requirements");
     }
 
