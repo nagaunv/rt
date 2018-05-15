@@ -35,6 +35,16 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/glfw)
 
 # ------------------------------------------
+# Build fmt
+# ------------------------------------------
+add_subdirectory(external/fmt)
+
+# ------------------------------------------
+# Build Selene
+# ------------------------------------------
+add_subdirectory(external/selene)
+
+# ------------------------------------------
 # Set compiler flags
 # ------------------------------------------
 if (MSVC)
@@ -49,7 +59,6 @@ endif()
 add_executable(
   rt
   src/main.cpp
-  external/fmt/src/format.cc
 )
 
 add_executable(
@@ -68,4 +77,10 @@ target_link_libraries(
   imgui_example
   glfw
   ${VULKAN_LIBRARY}
+)
+
+target_link_libraries(
+  rt
+  fmt
+  selene::selene
 )
