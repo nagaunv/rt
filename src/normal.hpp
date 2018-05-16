@@ -17,14 +17,14 @@ namespace naga::rt {
     /// Ctor
     constexpr Normal3() {}
     /// Ctor
-    constexpr Normal3(const Normal3&);
+    constexpr Normal3(const Normal3&) = default;
     /// Ctor
-    constexpr Normal3(Normal3&&);
+    constexpr Normal3(Normal3&&)      = default;
 
     /// operator==
     constexpr Normal3& operator=(const Normal3&) = default;
     /// operator==
-    constexpr Normal3& operator=(Normal3&) = default;
+    constexpr Normal3& operator=(Normal3&)       = default;
 
     /// Create Normal3 from vec3
     explicit constexpr Normal3(const vec3& vec) : vec3(vec) {}

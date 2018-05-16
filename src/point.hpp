@@ -20,12 +20,12 @@ namespace naga::rt {
     /// Crot
     constexpr Point3(const Point3&) = default;
     /// Ctor
-    constexpr Point3(Point3&&) = default;
+    constexpr Point3(Point3&&)      = default;
 
     /// operator=
     constexpr Point3& operator=(const Point3&) = default;
     /// operator=
-    constexpr Point3& operator=(Point3&&) = default;
+    constexpr Point3& operator=(Point3&&)      = default;
 
     /** \brief Create Point3 from vec3
      * Initialize Point3 as (Origin(0,0,0) + vec)) = vec
