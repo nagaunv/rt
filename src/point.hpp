@@ -88,24 +88,24 @@ namespace naga::rt {
     /// operator=
     constexpr Point2& operator=(Point2&&) = default;
 
-    /** \brief Create Point3 from vec3
-     * Initialize Point3 as (Origin(0,0,0) + vec)) = vec
+    /** \brief Create Point2 from vec2
+     * Initialize Point2 as (Origin(0,0) + vec)) = vec
      */
     explicit constexpr Point2(const vec2& vec) : vec2(vec) {}
-    /** \brief Create Point3 from vec3
-     * Initialize Point3 as (Origin(0,0,0) + vec)) = vec
+    /** \brief Create Point2 from vec2
+     * Initialize Point2 as (Origin(0,0) + vec)) = vec
      */
     explicit constexpr Point2(vec2&& vec) : vec2(std::move(vec)) {}
 
-    /** \brief Conversion to vec3
-     * vec3 = Point3 - Origin(0,0,0) = Point3
+    /** \brief Conversion to vec2
+     * vec2 = Point2 - Origin(0,0) = Point2
      */
     constexpr const vec2& vec() const {
       return *this;
     }
 
-    /** \brief Conversion to vec3
-     * vec3 = Point3 - Origin(0,0,0) = Point3
+    /** \brief Conversion to vec2
+     * vec2 = Point2 - Origin(0,0) = Point2
      */
     constexpr vec2& vec() {
       return *this;
