@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <cmath>
+#include <fmt/format.h>
 
 #include "geometry.hpp"
 
@@ -158,6 +159,16 @@ namespace naga::rt {
   /// Calculate distance
   float_t distance(const Point2& lhs, const Point2& rhs){
     return distance(lhs.vec(), rhs.vec());
+  }
+
+  /// dump information to string
+  std::string to_string(const Point3& p){
+    return fmt::format("Point3({0}, {1}, {2})", p.x, p.y, p.z);
+  }
+
+  /// dump information to string
+  std::string to_string(const Point2& p){
+    return fmt::format("Point3({0}, {1})", p.x, p.y);
   }
 
 } // namespace naga::rt
