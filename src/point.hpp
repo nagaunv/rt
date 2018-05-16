@@ -149,4 +149,15 @@ namespace naga::rt {
     Point2 tmp(lhs);
     return tmp -= rhs;
   }
+
+  /// Calculate distance
+  float_t distance(const Point3& lhs, const Point3& rhs){
+    return distance(lhs.vec(), rhs.vec());
+  }
+
+  /// Calculate distance
+  float_t distance(const Point2& lhs, const Point2& rhs){
+    return distance(lhs.vec(), rhs.vec());
+  }
+
 } // namespace naga::rt
