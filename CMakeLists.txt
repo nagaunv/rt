@@ -16,7 +16,7 @@ include(ExternalProject)
 # ------------------------------------------
 # Find Vulkan (requires Vulkan SDK)
 # ------------------------------------------
-find_package(Vulkan)
+find_package(Vulkan REQUIRED)
 set(VULKAN_INCLUDE_DIR ${Vulkan_INCLUDE_DIR})
 set(VULKAN_LIBRARY ${Vulkan_LIBRARY})
 include_directories(rt ${VULKAN_INCLUDE_DIR})
