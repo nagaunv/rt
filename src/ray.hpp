@@ -2,7 +2,8 @@
 
 #include <string>
 #include <fmt/format.h>
-#include "geometry.hpp"
+
+#include "point.hpp"
 
 /// \file Ray definition
 
@@ -29,26 +30,18 @@ namespace naga::rt {
      * Stores origin and normalized direction.  
      * \notes: dropping constexpr since glm does not support it.
      */
-    /*constexpr*/ Ray(const vec3 &o, const vec3 &d) : m_origin{o}, m_dir{normalize(d)} {}
+    /*constexpr*/ Ray(const Point3 &o, const vec3 &d) : m_origin{o}, m_dir{normalize(d)} {}
 
     /// Get origin
-    constexpr const vec3 &origin() const {
+    constexpr const Point3 &get_origin() const {
       return m_origin;
     }
     /// Get direction
-    constexpr const vec3 &dir() const {
+    constexpr const vec3 &get_dir() const {
       return m_dir;
     }
-    /// Get origin
-    constexpr const vec3 &get_origin() const {
-      return origin();
-    }
-    /// Get direction
-    constexpr const vec3 &get_dir() const {
-      return dir();
-    }
     /// Set origin
-    constexpr void set_origin(const vec3 &o) {
+    constexpr void set_origin(const Point3 &o) {
       m_origin = o;
     }
     /** \brief Set direction
@@ -59,9 +52,18 @@ namespace naga::rt {
       m_dir = normalize(d);
     }
 
+    /// Get origin
+    constexpr const Point3 &origin() const {
+      return get_origin();
+    }
+    /// Get direction
+    constexpr const vec3 &dir() const {
+      return get_dir();
+    }
+
   private:
     /// Origin
-    vec3 m_origin;
+    Point3 m_origin;
     /// (normalized) Direction
     vec3 m_dir;
   };
@@ -70,7 +72,7 @@ namespace naga::rt {
    * `origin + t * dir`
    * \notes: dropping constexpr since glm does not support it.
    */
-  /*constepxr*/ vec3 position(const Ray &ray, float_t t) {
+  /*constepxr*/ Point3 position(const Ray &ray, float_t t) {
     return ray.origin() + t * ray.dir();
   }
 
