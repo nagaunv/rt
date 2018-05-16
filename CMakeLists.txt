@@ -3,6 +3,11 @@
 project(rt)
 
 # ------------------------------------------
+# options
+# ------------------------------------------
+option(RT_BUILD_TESTS "Build Tests" ON)
+
+# ------------------------------------------
 # Enable CTest
 # ------------------------------------------
 include (CTest)
@@ -47,10 +52,20 @@ add_subdirectory(external/selene)
 # ------------------------------------------
 # Set compiler flags
 # ------------------------------------------
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTNSIONS OFF)
 if (MSVC)
-  set(CMAKE_CXX_FLAGS "/W4 /permissive- /std:c++latest")
+  set(RT_COMPILER_OPTIONS /W4 /permissive-)
 else()
-  set(CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++17 -g -static")
+  set(RT_COMPILER_OPTIONS -Wall -Wextra -g)
+endif()
+
+# ------------------------------------------
+# tests
+# ------------------------------------------
+if (RT_BUILD_TESTS)
+  add_subdirectory(test)
 endif()
 
 # ------------------------------------------
@@ -71,16 +86,24 @@ add_executable(
 )
 
 # ------------------------------------------
+# compiler options
+# ------------------------------------------
+target_compile_options(rt PRIVATE ${RT_COMPILER_OPTIONS})
+target_compile_options(imgui_example PRIVATE ${RT_COMPILER_OPTIONS})
+
+# ------------------------------------------
 # lib
 # ------------------------------------------
 target_link_libraries(
   imgui_example
   glfw
   ${VULKAN_LIBRARY}
+  -static
 )
 
 target_link_libraries(
   rt
   fmt
   selene::selene
+  -static
 )
