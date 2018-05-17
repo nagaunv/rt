@@ -3,6 +3,8 @@
 #include <string>
 #include <fmt/format.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "float.hpp"
 
@@ -23,6 +25,9 @@ namespace naga::rt {
   /// 4x4 matrix
   using mat4 = glm::tmat4x4<float_t>;
 
+  /// quat
+  using quat = glm::tquat<float_t>;
+
   /// dump information to text
   std::string to_string(const vec2& v) {
     return fmt::format("vec2[{0}, {1}]", v.x, v.y);
@@ -34,6 +39,10 @@ namespace naga::rt {
   /// dump information to text
   std::string to_string(const vec4& v) {
     return fmt::format("vec2[{0}, {1}, {2}, {3}]", v.x, v.y, v.z, v.w);
+  }
+  /// dump information to text
+  std::string to_string(const quat& q) {
+    return fmt::format("quat[{0}, {1}, {2}, {3}]", q.x, q.y, q.z, q.w);
   }
 
   /// dump information to text
