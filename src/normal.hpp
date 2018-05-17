@@ -53,6 +53,11 @@ namespace naga::rt {
     return Normal3(faceforward(normal.vec(), incident, normal_ref.vec()));
   }
 
+  /// faceforward (GLSL, not pbrt)
+  Normal3 faceforward(const Normal3& normal, const vec3& incident) {
+    return faceforward(normal, incident, normal);
+  }
+
   /// reflect
   vec3 reflect(const vec3& incident, const Normal3& normal) {
     return reflect(incident, normal.vec());
