@@ -17,11 +17,16 @@ namespace naga::rt {
     /// Get shape
     virtual std::shared_ptr<Shape> getShape() = 0;
     /// Dtor
-    virtual ~Primitive(){};
+    virtual ~Primitive();
   };
 
   /// GeometrycPrimitive
   class GeometricPrimitive : public Primitive {
+    /// Ctor
+    GeometricPrimitive(
+      const std::shared_ptr<Material>& m,
+      const std::shared_ptr<AreaLight>& l,
+      const std::shared_ptr<Shape> s);
     /// Get material
     virtual std::shared_ptr<Material> getMaterial() override;
     /// Get area light
