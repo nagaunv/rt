@@ -94,16 +94,21 @@ target_compile_options(imgui_example PRIVATE ${RT_COMPILER_OPTIONS})
 # ------------------------------------------
 # lib
 # ------------------------------------------
+
+# rt_cpp
+add_subdirectory(src)
+
 target_link_libraries(
-  imgui_example
-  glfw
-  ${VULKAN_LIBRARY}
+  rt
+  rt_cpp
+  fmt
+  selene::selene
   -static
 )
 
 target_link_libraries(
-  rt
-  fmt
-  selene::selene
+  imgui_example
+  glfw
+  ${VULKAN_LIBRARY}
   -static
 )
