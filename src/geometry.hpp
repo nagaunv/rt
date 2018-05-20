@@ -12,52 +12,52 @@
 
 namespace naga::rt {
   /// 2D vector
-  using vec2 = glm::tvec2<float_t>;
+  using Vec2 = glm::tvec2<float_t>;
   /// 3D vector
-  using vec3 = glm::tvec3<float_t>;
+  using Vec3 = glm::tvec3<float_t>;
   /// 4D vector
-  using vec4 = glm::tvec4<float_t>;
+  using Vec4 = glm::tvec4<float_t>;
 
   /// 2x2 matrix
-  using mat2 = glm::tmat2x2<float_t>;
+  using Mat2 = glm::tmat2x2<float_t>;
   /// 3x3 matrix
-  using mat3 = glm::tmat3x3<float_t>;
+  using Mat3 = glm::tmat3x3<float_t>;
   /// 4x4 matrix
-  using mat4 = glm::tmat4x4<float_t>;
+  using Mat4 = glm::tmat4x4<float_t>;
 
   /// quat
-  using quat = glm::tquat<float_t>;
+  using Quat = glm::tquat<float_t>;
 
   /// dump information to text
-  std::string to_string(const vec2& v) {
-    return fmt::format("vec2[{0}, {1}]", v.x, v.y);
+  std::string to_string(const Vec2& v) {
+    return fmt::format("Vec2[{0}, {1}]", v.x, v.y);
   }
   /// dump information to text
-  std::string to_string(const vec3& v) {
-    return fmt::format("vec2[{0}, {1}, {2}]", v.x, v.y, v.z);
+  std::string to_string(const Vec3& v) {
+    return fmt::format("Vec2[{0}, {1}, {2}]", v.x, v.y, v.z);
   }
   /// dump information to text
-  std::string to_string(const vec4& v) {
-    return fmt::format("vec2[{0}, {1}, {2}, {3}]", v.x, v.y, v.z, v.w);
+  std::string to_string(const Vec4& v) {
+    return fmt::format("Vec2[{0}, {1}, {2}, {3}]", v.x, v.y, v.z, v.w);
   }
   /// dump information to text
-  std::string to_string(const quat& q) {
-    return fmt::format("quat[{0}, {1}, {2}, {3}]", q.x, q.y, q.z, q.w);
+  std::string to_string(const Quat& q) {
+    return fmt::format("Quat[{0}, {1}, {2}, {3}]", q.x, q.y, q.z, q.w);
   }
 
   /// dump information to text
-  std::string to_string(const mat2& m) {
+  std::string to_string(const Mat2& m) {
     return fmt::format(
-      "mat2"            //
+      "Mat2"            //
       "[{0}, {1}]"      //
       "[{2}, {3}]",     //
       m[0][0], m[0][1], //
       m[1][0], m[1][1]);
   }
   /// dump information to text
-  std::string to_string(const mat3& m) {
+  std::string to_string(const Mat3& m) {
     return fmt::format(
-      "mat3"                     //
+      "Mat3"                     //
       "[{0}, {1}, {2}]"          //
       "[{3}, {4}, {5}]"          //
       "[{6}, {7}, {8}]",         //
@@ -66,9 +66,9 @@ namespace naga::rt {
       m[2][0], m[2][1], m[2][2]);
   }
   /// dump information to text
-  std::string to_string(const mat4& m) {
+  std::string to_string(const Mat4& m) {
     return fmt::format(
-      "mat4"                              //
+      "Mat4"                              //
       "[{0}, {1}, {2}, {3}]"              //
       "[{4}, {5}, {6}, {7}]"              //
       "[{8}, {9}, {10}, {11}]"            //
