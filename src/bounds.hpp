@@ -81,7 +81,7 @@ namespace naga::rt {
     }
 
     /// Compute intersection
-    bool intersec(const Ray& ray, float_t tMin, float_t tMax) {
+    bool intersect(const Ray& ray, float_t tMin, float_t tMax) {
       // calculate Ray/Plane intersections.
       Vec3 d = Vec3(1) / ray.dir();
       Vec3 Near = (m_min - ray.origin()) * d;
