@@ -10,8 +10,8 @@ namespace naga::rt {
   class Shape {
   public:
     /// Calculate Ray-Shape intersection
-    virtual bool intersec(
-      const Ray& ray, float_t tMin, float_t tMax, Interaction& isec) const = 0;
+    virtual bool intersect(
+      const Ray& ray, float_t tMin, float_t tMax, Interaction* isec) const = 0;
     /// Get bounding box
     virtual Bounds3 getBoundingBox() const = 0;
     /// Dtor
@@ -23,7 +23,7 @@ namespace naga::rt {
   public:
     /// Bounding box in object space
     virtual Bounds3 getObjectBound() const = 0;
-    /// Get bounding box
+    /// Get bounding box (convert object space bounds to world space)
     virtual Bounds3 getBoundingBox() const override;
   protected:
     /// transform to world coordinate
