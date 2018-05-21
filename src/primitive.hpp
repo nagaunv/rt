@@ -3,8 +3,8 @@
 #include "geometry.hpp"
 #include "material.hpp"
 #include "ray.hpp"
-#include "intersection.hpp"
 #include "bounds.hpp"
+#include "interaction.hpp"
 
 namespace naga::rt {
   /// Primitive
@@ -17,7 +17,7 @@ namespace naga::rt {
     /// Get shape
     virtual std::shared_ptr<Shape> getShape() = 0;
     /// Dtor
-    virtual ~Primitive();
+    virtual ~Primitive() {}
   };
 
   /// GeometrycPrimitive
@@ -42,6 +42,6 @@ namespace naga::rt {
     /// AreaLight
     std::shared_ptr<AreaLight> m_areaLight;
     /// Shape
-    std::shared_ptr<Shape> m_shape
+    std::shared_ptr<Shape> m_shape;
   };
 }

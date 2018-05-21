@@ -1,9 +1,6 @@
 #include "primitive.hpp"
 
 namespace naga::rt {
-
-  Primitive::~Primitive() {}
-
   GeometricPrimitive::GeometricPrimitive(
     const std::shared_ptr<Material>& m,
     const std::shared_ptr<AreaLight>& l,
