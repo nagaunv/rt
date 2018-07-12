@@ -78,12 +78,16 @@ add_executable(
 
 add_executable(
   imgui_example
-  external/imgui/examples/vulkan_example/main.cpp
-  external/imgui/examples/vulkan_example/imgui_impl_glfw_vulkan.cpp
+  external/imgui/examples/example_glfw_vulkan/main.cpp
+  external/imgui/examples/imgui_impl_vulkan.cpp
+  external/imgui/examples/imgui_impl_glfw.cpp
   external/imgui/imgui.cpp
   external/imgui/imgui_draw.cpp
   external/imgui/imgui_demo.cpp
 )
+
+# add include directory for imgui example
+target_include_directories(imgui_example PUBLIC external/imgui/examples)
 
 # ------------------------------------------
 # compiler options
