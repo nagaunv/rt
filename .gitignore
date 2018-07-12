@@ -2,4 +2,4 @@
 .vscode
 local/
 bin/
-build/
+build*/
