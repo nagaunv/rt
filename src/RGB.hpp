@@ -1,66 +1,29 @@
 #pragma once
 
 #include "float.hpp"
-#include "CIE_XYZ.hpp"
+#include "XYZ.hpp"
 #include "geometry.hpp"
 
 namespace naga::rt {
+
+  struct RGBColor {
+    union {
+      struct {
+        float_t r, g, b;
+      };
+      float_t value[3];
+    };
+
+    RGBColor(float_t r, float_t g, float_t b) : value{r, g, b} {};
+    RGBColor(const Vec3& vec);
+    const float_t& operator[](size_t i) const;
+    float_t& operator[](size_t i);
+    Vec3 to_vec() const;
+    XYZColor to_xyz() const;
+  };
+
   /// Convert XYZ color to sRGB color space
-  Vec3 XYZToRGB(const Vec3& xyz) {
-    Vec3 ret{};
-
-    // convert color space
-    ret[0] = +3.2406 * xyz[0] - 1.5372 * xyz[1] - 0.4986 * xyz[2];
-    ret[1] = -0.9689 * xyz[0] + 1.8758 * xyz[1] + 0.0415 * xyz[2];
-    ret[2] = +0.0557 * xyz[0] - 0.2040 * xyz[1] + 1.0570 * xyz[2];
-
-    // gamma correction
-    auto gamma = [](auto c) {
-      if (c <= 0.0031308)
-        return 12.92 * c;
-      else
-        return fms(1.055, std::pow(c, 1 / 2.4), 0.055);
-    };
-
-    ret[0] = gamma(ret[0]);
-    ret[1] = gamma(ret[1]);
-    ret[2] = gamma(ret[2]);
-
-    // clamp
-    ret[0] = std::clamp(ret[0], 0.f, 1.f);
-    ret[1] = std::clamp(ret[1], 0.f, 1.f);
-    ret[2] = std::clamp(ret[2], 0.f, 1.f);
-
-    return ret;
-  }
-  /// Convert sRGB color to XYZ color space
-  Vec3 RGBToXYZ(const Vec3& rgb) {
-    Vec3 ret{};
-
-    // gamma correction
-    auto gamma = [](auto c) {
-      if (c <= 0.04045)
-        return c / 12.92;
-      else
-        return std::pow((c + 0.055) / (1.055), 2.4);
-    };
-
-    ret[0] = gamma(rgb[0]);
-    ret[1] = gamma(rgb[1]);
-    ret[2] = gamma(rgb[2]);
-
-    // convert color space
-    ret[0] = 0.4124 * rgb[0] + 0.3576 * rgb[1] + 0.1805 * rgb[2];
-    ret[1] = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
-    ret[2] = 0.0193 * rgb[0] + 0.1192 * rgb[1] + 0.9505 * rgb[2];
-
-    // clamp
-    ret[0] = std::clamp(ret[0], 0.f, 1.f);
-    ret[1] = std::clamp(ret[1], 0.f, 1.f);
-    ret[2] = std::clamp(ret[2], 0.f, 1.f);
-
-    return ret;
-  }
+  Vec3 XYZToRGB(const Vec3& xyz);
 
   namespace RGBToSpectrum {
     static constexpr size_t nSamples = 32;

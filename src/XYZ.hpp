@@ -1,8 +1,32 @@
 #pragma once
 
 #include <cstddef>
+#include "float.hpp"
+#include "geometry.hpp"
 
 namespace naga::rt {
+
+  struct RGBColor;
+
+  struct XYZColor {
+    union {
+      struct {
+        float_t x, y, z;
+      };
+      float_t value[3];
+    };
+
+    XYZColor(float_t x, float_t y, float_t z) : value{x, y, z} {}
+    XYZColor(const Vec3& vec);
+    const float_t& operator[](size_t i) const;
+    float_t& operator[](size_t i);
+    Vec3 to_vec() const;
+    RGBColor to_rgb() const;
+  };
+
+  /// Convert sRGB color to XYZ color space
+  Vec3 RGBToXYZ(const Vec3& rgb);
+
   /// CIE XYZ samples
   namespace CIE_XYZ {
     /// number of samples
