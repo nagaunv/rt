@@ -284,7 +284,76 @@ namespace naga::rt {
     static const SampledSpectrum iGreen;
     static const SampledSpectrum iBlue;
 
-    
+    /// Convert RGB to spectrum (Smit 1999)
+    static SampledSpectrum fromRGB(const Vec3& rgb, SpectrumType type) {
+      SampledSpectrum ret;
+      if (type == SpectrumType::Reflectance) {
+        if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2]) {
+          ret += rgb[0] * rWhite;
+          if (rgb[1] <= rgb[2]) {
+            ret += (rgb[1] - rgb[0]) * rCyan;
+            ret += (rgb[2] - rgb[1]) * rBlue;
+          } else {
+            ret += (rgb[2] - rgb[0]) * rCyan;
+            ret += (rgb[1] - rgb[2]) * rGreen;
+          }
+        } else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2]) {
+          ret += rgb[1] * rWhite;
+          if (rgb[0] <= rgb[2]) {
+            ret += (rgb[0] - rgb[1]) * rMagenta;
+            ret += (rgb[2] - rgb[0]) * rBlue;
+          } else {
+            ret += (rgb[2] - rgb[1]) * rMagenta;
+            ret += (rgb[0] - rgb[2]) * rRed;
+          }
+        } else {
+          ret += rgb[2] * rWhite;
+          if (rgb[0] <= rgb[1]) {
+            ret += (rgb[0] - rgb[2]) * rMagenta;
+            ret += (rgb[1] - rgb[0]) * rBlue;
+          } else {
+            ret += (rgb[1] - rgb[2]) * rMagenta;
+            ret += (rgb[0] - rgb[1]) * rRed;
+          }
+        }
+        ret *= 0.94;
+      } else if (type == SpectrumType::Illuminant) {
+        if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2]) {
+          ret += rgb[0] * rWhite;
+          if (rgb[1] <= rgb[2]) {
+            ret += (rgb[1] - rgb[0]) * iCyan;
+            ret += (rgb[2] - rgb[1]) * iBlue;
+          } else {
+            ret += (rgb[2] - rgb[0]) * iCyan;
+            ret += (rgb[1] - rgb[2]) * iGreen;
+          }
+        } else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2]) {
+          ret += rgb[1] * rWhite;
+          if (rgb[0] <= rgb[2]) {
+            ret += (rgb[0] - rgb[1]) * iMagenta;
+            ret += (rgb[2] - rgb[0]) * iBlue;
+          } else {
+            ret += (rgb[2] - rgb[1]) * iMagenta;
+            ret += (rgb[0] - rgb[2]) * iRed;
+          }
+        } else {
+          ret += rgb[2] * iWhite;
+          if (rgb[0] <= rgb[1]) {
+            ret += (rgb[0] - rgb[2]) * iMagenta;
+            ret += (rgb[1] - rgb[0]) * iBlue;
+          } else {
+            ret += (rgb[1] - rgb[2]) * iMagenta;
+            ret += (rgb[0] - rgb[1]) * iRed;
+          }
+        }
+        ret *= 0.86445;
+      }
+      return clamp(ret, 0.f, std::numeric_limits<float_t>::max());
+    }
+
+    static SampledSpectrum fromXYZ(const Vec3& xyz, SpectrumType type) {
+      return fromRGB(XYZToRGB(xyz), type);
+    }
   };
 
   template <size_t N>
