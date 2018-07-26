@@ -6,10 +6,18 @@
 #include <optional>
 #include "float.hpp"
 #include "geometry.hpp"
-#include "CIE_XYZ.hpp"
-#include "sRGB.hpp"
+#include "XYZ.hpp"
+#include "RGB.hpp"
 
 namespace naga::rt {
+
+  /// calculate avarage spectrum
+  template <class Container>
+  constexpr float_t AverageSpectrumSamples(
+    const Container& samples, float_t lambdaStart, float_t lambdaEnd);
+
+  /// Spectrum Type
+  enum class SpectrumType { Reflectance, Illuminant };
 
   /// \brief CoefficientSpectrum
   /// \param N Number of sample spectrum
@@ -144,66 +152,6 @@ namespace naga::rt {
     const CoefficientSpectrum<N>& s2) {
     return (1 - t) * s1 + t * s2;
   }
-  /// Take average spectrum from samples
-  template <class Container>
-  constexpr float_t AverageSpectrumSamples(
-    const Container& samples, float_t lambdaStart, float_t lambdaEnd) {
-
-    // no sample points
-    if (samples.empty()) return 0;
-    // sampels are outside of range
-    if (lambdaEnd < samples.front().first) return samples.front().second;
-    // samples are outside of range
-    if (lambdaStart > samples.back().first) return samples.back().second;
-    // single sample
-    if (samples.size() == 1) return samples.front().second;
-
-    float_t area = 0.f;
-
-    // samples are partially inside
-    if (lambdaStart < samples.front().first) {
-      area += samples[0].second * (samples[0].first - lambdaStart);
-    }
-    // samples are partially inside
-    if (samples.back().first < lambdaEnd) {
-      area += samples.back().second * (lambdaEnd - samples.back().first);
-    }
-
-    // find segment
-    size_t i = 0;
-    while (lambdaStart > samples[i + 1].first)
-      ++i;
-
-    // no sample point inside
-    if (samples[i + 1].first > lambdaEnd) {
-      auto l = samples[i + 1].first - samples[i].first;
-      auto p1 = lambdaStart / l;
-      auto p2 = lambdaEnd / l;
-      auto v1 = samples[i].second * p1 + samples[i + 1].second * (1 - p1);
-      auto v2 = samples[i].second * p2 + samples[i + 1].second * (1 - p2);
-      return (v1 + v2) / 2;
-    }
-
-    // interpolate samples
-    auto interp = [&](float_t l, size_t i) {
-      return lerp(
-        (l - samples[i].first) / (samples[i + 1].first - samples[i].first),
-        samples[i].second, samples[i + 1].second);
-    };
-
-    for (; i + 1 < samples.size() && samples[i].first <= lambdaEnd; ++i) {
-      auto segmentS = std::max(lambdaStart, samples[i].first);
-      auto segmentE = std::min(lambdaEnd, samples[i + 1].first);
-      auto l1 = interp(segmentS, i);
-      auto l2 = interp(segmentE, i);
-      area += (l1 + l2) * (segmentE - segmentS) * 0.5;
-    }
-
-    return area / (lambdaEnd - lambdaStart);
-  }
-
-  /// Spectrum Type
-  enum class SpectrumType { Reflectance, Illuminant };
 
   /// \brief SampledSpectrum
   /// \param Start start frequency
@@ -244,6 +192,13 @@ namespace naga::rt {
         this->m_samples[i] = AverageSpectrumSamples(s, ls, le);
       }
     }
+
+    /// Construct SampledSpectrum from sRGB color
+    SampledSpectrum(const RGBColor& rgb, SpectrumType type);
+
+    /// Construct SampledSpectrum from XYZ color
+    SampledSpectrum(const XYZColor& rgb, SpectrumType type);
+
     constexpr size_t lambdaStart() const {
       return sampleLambdaStart;
     }
@@ -253,7 +208,10 @@ namespace naga::rt {
 
     /// convert spectrum to XYZ coefficients with
     /// $ \frac{1}{\int{Y(\lambda)}} \frac{\lambda_{end} - \lambda_{start}}{N} \sum_0^{N-1}{X_{i}c_i} $
-    Vec3 toXYZ() const;
+    XYZColor toXYZ() const;
+
+    /// convert spectrum to RGB cofficient
+    RGBColor toRGB() const;
 
     /// get Y
     float_t toY() const;
@@ -284,76 +242,43 @@ namespace naga::rt {
     static const SampledSpectrum iGreen;
     static const SampledSpectrum iBlue;
 
-    /// Convert RGB to spectrum (Smit 1999)
-    static SampledSpectrum fromRGB(const Vec3& rgb, SpectrumType type) {
-      SampledSpectrum ret;
-      if (type == SpectrumType::Reflectance) {
-        if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2]) {
-          ret += rgb[0] * rWhite;
-          if (rgb[1] <= rgb[2]) {
-            ret += (rgb[1] - rgb[0]) * rCyan;
-            ret += (rgb[2] - rgb[1]) * rBlue;
-          } else {
-            ret += (rgb[2] - rgb[0]) * rCyan;
-            ret += (rgb[1] - rgb[2]) * rGreen;
-          }
-        } else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2]) {
-          ret += rgb[1] * rWhite;
-          if (rgb[0] <= rgb[2]) {
-            ret += (rgb[0] - rgb[1]) * rMagenta;
-            ret += (rgb[2] - rgb[0]) * rBlue;
-          } else {
-            ret += (rgb[2] - rgb[1]) * rMagenta;
-            ret += (rgb[0] - rgb[2]) * rRed;
-          }
-        } else {
-          ret += rgb[2] * rWhite;
-          if (rgb[0] <= rgb[1]) {
-            ret += (rgb[0] - rgb[2]) * rMagenta;
-            ret += (rgb[1] - rgb[0]) * rBlue;
-          } else {
-            ret += (rgb[1] - rgb[2]) * rMagenta;
-            ret += (rgb[0] - rgb[1]) * rRed;
-          }
-        }
-        ret *= 0.94;
-      } else if (type == SpectrumType::Illuminant) {
-        if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2]) {
-          ret += rgb[0] * rWhite;
-          if (rgb[1] <= rgb[2]) {
-            ret += (rgb[1] - rgb[0]) * iCyan;
-            ret += (rgb[2] - rgb[1]) * iBlue;
-          } else {
-            ret += (rgb[2] - rgb[0]) * iCyan;
-            ret += (rgb[1] - rgb[2]) * iGreen;
-          }
-        } else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2]) {
-          ret += rgb[1] * rWhite;
-          if (rgb[0] <= rgb[2]) {
-            ret += (rgb[0] - rgb[1]) * iMagenta;
-            ret += (rgb[2] - rgb[0]) * iBlue;
-          } else {
-            ret += (rgb[2] - rgb[1]) * iMagenta;
-            ret += (rgb[0] - rgb[2]) * iRed;
-          }
-        } else {
-          ret += rgb[2] * iWhite;
-          if (rgb[0] <= rgb[1]) {
-            ret += (rgb[0] - rgb[2]) * iMagenta;
-            ret += (rgb[1] - rgb[0]) * iBlue;
-          } else {
-            ret += (rgb[1] - rgb[2]) * iMagenta;
-            ret += (rgb[0] - rgb[1]) * iRed;
-          }
-        }
-        ret *= 0.86445;
-      }
-      return clamp(ret, 0.f, std::numeric_limits<float_t>::max());
-    }
+  };
 
-    static SampledSpectrum fromXYZ(const Vec3& xyz, SpectrumType type) {
-      return fromRGB(XYZToRGB(xyz), type);
-    }
+  class RGBSpectrum :public CoefficientSpectrum<3> {
+    public:
+      /// Ctor
+      RGBSpectrum() = default;
+      /// Ctor
+      RGBSpectrum(const RGBSpectrum&) = default;
+      /// Ctor
+      RGBSpectrum(RGBSpectrum&&) = default;
+      /// operator=
+      RGBSpectrum& operator=(const RGBSpectrum&) = default;
+      /// operator=
+      RGBSpectrum& operator=(RGBSpectrum&&) = default;
+
+      /// Construct RGBSpectrum from constant value
+      RGBSpectrum(float_t v) : CoefficientSpectrum<3>(v){};
+
+      /// Construct RGBSpectrum from sRGB color
+      RGBSpectrum(const RGBColor& rgb) {
+        this->m_samples[0] = rgb[0];
+        this->m_samples[1] = rgb[1];
+        this->m_samples[2] = rgb[2];
+      }
+      /// Construct RGBSpectrum from XYZ color
+      RGBSpectrum(const XYZColor& xyz) : RGBSpectrum(xyz.to_rgb()){};
+
+
+      /// get sRGB color
+      RGBColor toRGB() const {
+        return {m_samples[0], m_samples[1], m_samples[2]};
+      }
+
+      /// get XYZ color
+      XYZColor toXYZ() const {
+        return toRGB().to_xyz();
+      }
   };
 
   template <size_t N>
@@ -420,6 +345,135 @@ namespace naga::rt {
     }
 
   } // namespace CIE_XYZ
+
+  /// Take average spectrum from samples
+  template <class Container>
+  constexpr float_t AverageSpectrumSamples(
+    const Container& samples, float_t lambdaStart, float_t lambdaEnd) {
+
+    // no sample points
+    if (samples.empty()) return 0;
+    // sampels are outside of range
+    if (lambdaEnd < samples.front().first) return samples.front().second;
+    // samples are outside of range
+    if (lambdaStart > samples.back().first) return samples.back().second;
+    // single sample
+    if (samples.size() == 1) return samples.front().second;
+
+    float_t area = 0.f;
+
+    // samples are partially inside
+    if (lambdaStart < samples.front().first) {
+      area += samples[0].second * (samples[0].first - lambdaStart);
+    }
+    // samples are partially inside
+    if (samples.back().first < lambdaEnd) {
+      area += samples.back().second * (lambdaEnd - samples.back().first);
+    }
+
+    // find segment
+    size_t i = 0;
+    while (lambdaStart > samples[i + 1].first)
+      ++i;
+
+    // no sample point inside
+    if (samples[i + 1].first > lambdaEnd) {
+      auto l = samples[i + 1].first - samples[i].first;
+      auto p1 = lambdaStart / l;
+      auto p2 = lambdaEnd / l;
+      auto v1 = samples[i].second * p1 + samples[i + 1].second * (1 - p1);
+      auto v2 = samples[i].second * p2 + samples[i + 1].second * (1 - p2);
+      return (v1 + v2) / 2;
+    }
+
+    // interpolate samples
+    auto interp = [&](float_t l, size_t i) {
+      return lerp(
+        (l - samples[i].first) / (samples[i + 1].first - samples[i].first),
+        samples[i].second, samples[i + 1].second);
+    };
+
+    for (; i + 1 < samples.size() && samples[i].first <= lambdaEnd; ++i) {
+      auto segmentS = std::max(lambdaStart, samples[i].first);
+      auto segmentE = std::min(lambdaEnd, samples[i + 1].first);
+      auto l1 = interp(segmentS, i);
+      auto l2 = interp(segmentE, i);
+      area += (l1 + l2) * (segmentE - segmentS) * 0.5;
+    }
+
+    return area / (lambdaEnd - lambdaStart);
+  }
+
+  template <size_t Start, size_t End, size_t N>
+  SampledSpectrum<Start, End, N>::SampledSpectrum(const RGBColor& rgb, SpectrumType type) {
+    if (type == SpectrumType::Reflectance) {
+      if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2]) {
+        *this += rgb[0] * rWhite;
+        if (rgb[1] <= rgb[2]) {
+          *this += (rgb[1] - rgb[0]) * rCyan;
+          *this += (rgb[2] - rgb[1]) * rBlue;
+        } else {
+          *this += (rgb[2] - rgb[0]) * rCyan;
+          *this += (rgb[1] - rgb[2]) * rGreen;
+        }
+      } else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2]) {
+        *this += rgb[1] * rWhite;
+        if (rgb[0] <= rgb[2]) {
+          *this += (rgb[0] - rgb[1]) * rMagenta;
+          *this += (rgb[2] - rgb[0]) * rBlue;
+        } else {
+          *this += (rgb[2] - rgb[1]) * rMagenta;
+          *this += (rgb[0] - rgb[2]) * rRed;
+        }
+      } else {
+        *this += rgb[2] * rWhite;
+        if (rgb[0] <= rgb[1]) {
+          *this += (rgb[0] - rgb[2]) * rMagenta;
+          *this += (rgb[1] - rgb[0]) * rBlue;
+        } else {
+          *this += (rgb[1] - rgb[2]) * rMagenta;
+          *this += (rgb[0] - rgb[1]) * rRed;
+        }
+      }
+      *this *= 0.94;
+    } else if (type == SpectrumType::Illuminant) {
+      if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2]) {
+        *this += rgb[0] * rWhite;
+        if (rgb[1] <= rgb[2]) {
+          *this += (rgb[1] - rgb[0]) * iCyan;
+          *this += (rgb[2] - rgb[1]) * iBlue;
+        } else {
+          *this += (rgb[2] - rgb[0]) * iCyan;
+          *this += (rgb[1] - rgb[2]) * iGreen;
+        }
+      } else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2]) {
+        *this += rgb[1] * rWhite;
+        if (rgb[0] <= rgb[2]) {
+          *this += (rgb[0] - rgb[1]) * iMagenta;
+          *this += (rgb[2] - rgb[0]) * iBlue;
+        } else {
+          *this += (rgb[2] - rgb[1]) * iMagenta;
+          *this += (rgb[0] - rgb[2]) * iRed;
+        }
+      } else {
+        *this += rgb[2] * iWhite;
+        if (rgb[0] <= rgb[1]) {
+          *this += (rgb[0] - rgb[2]) * iMagenta;
+          *this += (rgb[1] - rgb[0]) * iBlue;
+        } else {
+          *this += (rgb[1] - rgb[2]) * iMagenta;
+          *this += (rgb[0] - rgb[1]) * iRed;
+        }
+      }
+      *this *= 0.86445;
+    }
+    *this = clamp(*this, 0.f, std::numeric_limits<float_t>::max());
+  }
+
+  template <size_t Start, size_t End, size_t N>
+  SampledSpectrum<Start, End, N>::SampledSpectrum(const XYZColor& xyz, SpectrumType type) {
+    SampledSpectrum(xyz.to_rgb());
+  }
 
   template <size_t Start, size_t End, size_t N>
   constexpr SampledSpectrum<Start, End, N>
@@ -493,7 +547,7 @@ namespace naga::rt {
       spectSampleToArray(RGBToSpectrum::lambda, RGBToSpectrum::iBlue));
 
   template <size_t Start, size_t End, size_t N>
-  Vec3 SampledSpectrum<Start, End, N>::toXYZ() const {
+  XYZColor SampledSpectrum<Start, End, N>::toXYZ() const {
     Vec3 sum{0};
     for (size_t i = 0; i < N; ++i) {
       sum[0] += XCurve[i] * this->m_samples[i];
@@ -515,6 +569,11 @@ namespace naga::rt {
     sum[1] = std::clamp(sum[2], 0.f, 1.f);
 
     return sum;
+  }
+
+  template <size_t Start, size_t End, size_t N>
+  RGBColor SampledSpectrum<Start, End, N>::toRGB() const {
+    return toXYZ().to_rgb();
   }
 
   template <size_t Start, size_t End, size_t N>
