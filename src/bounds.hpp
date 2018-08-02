@@ -102,4 +102,23 @@ namespace naga::rt {
     Vec3 m_min;
     Vec3 m_max;
   };
+
+  class Bounds2 {
+  public:
+    constexpr Bounds2() = default;
+    constexpr Bounds2(const Vec2& p1, const Vec2& p2)
+      : m_min{glm::min(p1, p2)}, m_max{glm::max(p1, p2)} {}
+    constexpr Bounds2(const Vec2& p) : m_min{p}, m_max{p} {}
+    constexpr const Vec2& min() const {
+      return m_min;
+    }
+
+    constexpr const Vec2& max() const {
+      return m_max;
+    }
+
+  private:
+    Vec2 m_min;
+    Vec2 m_max;
+  };
 }
