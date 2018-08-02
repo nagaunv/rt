@@ -42,4 +42,88 @@ namespace naga::rt {
   std::string to_string(const Mat3& m);
   /// dump information to text
   std::string to_string(const Mat4& m);
-}
+
+  struct Point2 : Vec2 {
+    using Vec2::Vec2;
+
+    const Vec2& vec() const {
+      return *this;
+    }
+
+    Vec2& vec() {
+      return *this;
+    }
+  };
+
+  struct Point3 : Vec3 {
+    using Vec3::Vec3;
+
+    const Vec3& vec() const {
+      return *this;
+    }
+
+    Vec3& vec() {
+      return *this;
+    }
+  };
+
+  struct Normal3 : Vec3 {
+    using Vec3::Vec3;
+
+    const Vec3& vec() const {
+      return *this;
+    }
+
+    Vec3& vec() {
+      return *this;
+    }
+  };
+
+  template <class T>
+  constexpr T pi = static_cast<T>(3.14159265358979323846);
+
+  class Radian;
+
+  class Degree {
+  public:
+    constexpr Degree() = default;
+    constexpr Degree(const Degree&) = default;
+    constexpr Degree(Degree&&) = default;
+    constexpr Degree& operator=(const Degree&) = default;
+    constexpr Degree& operator=(Degree&&) = default;
+    constexpr Degree(float_t v) : m_value{v} {}
+    constexpr Degree(const Radian& rad);
+
+    constexpr float_t value() const {
+      return m_value;
+    }
+
+  private:
+    float_t m_value = 0.f;
+  };
+
+  class Radian {
+  public:
+    constexpr Radian() = default;
+    constexpr Radian(const Radian&) = default;
+    constexpr Radian(Radian&) = default;
+    constexpr Radian& operator=(const Radian&) = default;
+    constexpr Radian& operator=(Radian&&) = default;
+    constexpr Radian(float_t v) : m_value{v} {}
+    constexpr Radian(const Degree& deg);
+
+    constexpr float_t value() const {
+      return m_value;
+    }
+
+  private:
+    float_t m_value = 0.f;
+  };
+
+  constexpr Degree::Degree(const Radian& rad)
+    : m_value{180 / pi<float_t> * rad.value()} {}
+
+  constexpr Radian::Radian(const Degree& deg)
+    : m_value{pi<float_t> / 180 * deg.value()} {}
+
+} // namespace naga::rt
